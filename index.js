@@ -1,31 +1,42 @@
 const http = require("http");
 const fs = require("fs");
 
-const serveError = (res,statusCode,message)=>{
-    res.writeHead(statusCode,{"Content-Type":"text/html"})
-    res.end(`<h1>${message}</h1>`)
-}
 
-const handleRequest = (req,res)=>{
-    const filePath = req.url === "/" ? "index.html":`./${req.url}.html`
-    console.log(filePath)
-    fs.readFile(filePath,"utf-8",(err,data)=>{
-        if(err){
-            console.log(err);
-            serveError(res,404,"Page not found");
-        }else{
-            res.writeHead(200,{"Content-Type":"text/html"})
-            res.end(data);
-        }
-    })
-}
+const server = http.createServer((req,res)=>{
 
-const server = http.createServer(handleRequest)
-server.listen(3001,(err)=>{
+    switch(req.url){
+        case '/file':
+            // task 2
+            fs.readFile("./data.txt","utf-8",(err,data)=>{
+                if(err){
+                    res.end("Not found")
+                }else{
+                    res.end(data)
+                }
+    
+            })
+        break;
+
+        case '/api/user':
+            // task 3
+            const user = {name:"John doe",email:"johndoe@mail.com",age:23}
+            res.statusCode = 200;
+            res.setHeader("Content-Type","application/json");
+            res.end(JSON.stringify(user))
+            break;
+        default:
+            // task 1
+            res.end("Hello, Node.js")
+    }
+    
+    
+})
+
+server.listen("3000",(err)=>{
     if(err){
         console.log(err)
     }else{
-        console.log("Listening at port 3001")
         
+        console.log("Listening at port 3000")
     }
 })
